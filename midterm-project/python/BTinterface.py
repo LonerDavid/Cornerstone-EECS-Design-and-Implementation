@@ -30,8 +30,7 @@ class BTInterface:
 
     def send_action(self, dirc):
         # TODO : send the action to car
-        
-        return
+        return self.bt.serial_write_string(dirc)
 
     def end_process(self):
         self.bt.serial_write_string("e")

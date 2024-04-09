@@ -26,6 +26,7 @@ class Maze:
         # For example, when parsing raw_data, you may create several Node objects.
         # Then you can store these objects into self.nodes.
         # Finally, add to nd_dict by {key(index): value(corresponding node)}
+        
         self.raw_data = pandas.read_csv(filepath).values
         self.nodes = []
         self.node_dict = dict()  # key: index, value: the correspond node
