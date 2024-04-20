@@ -59,7 +59,7 @@ BT_CMD ask_BT() {
 void send_msg(const char& msg) {
     // TODO:
     Serial1.write(msg);
-    Serial1.write('\n')
+    Serial1.write('\n');
 }  // send_msg
 
 // send UID back through Serial1(bluetooth serial)
@@ -67,7 +67,7 @@ void send_byte(byte* id, byte& idSize) {
     for (byte i = 0; i < idSize; i++) {  // Send UID consequently.
         Serial1.write(id[i]);
     }
-    Serial1.write('\n')
+    Serial1.write('\n');
 #ifdef DEBUG
     Serial.print("Sent id: ");
     for (byte i = 0; i < idSize; i++) {  // Show UID consequently.
