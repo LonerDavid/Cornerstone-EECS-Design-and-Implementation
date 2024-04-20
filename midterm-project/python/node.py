@@ -6,9 +6,9 @@ from enum import IntEnum
 # ex: print(Direction.SOUTH == 1) should return False
 class Direction(IntEnum):
     NORTH = 1
-    SOUTH = 2
-    WEST = 3
-    EAST = 4
+    SOUTH = 3
+    WEST = 4
+    EAST = 2
 
 
 # Construct class Node and its member functions
@@ -34,7 +34,16 @@ class Node:
         # TODO : if node is adjacent to the present node, return the direction of node from the present node
         # For example, if the direction of node from the present node is EAST, then return Direction.EAST = 4
         # However, if node is not adjacent to the present node, print error message and return 0
-        return
+        prev = self.get_successors(node)
+        dx = node - prev
+        if dx == -1:
+            return Direction.NORTH  # North
+        elif dx == 1:
+            return Direction.SOUTH  # South
+        elif dx == 6:
+            return Direction.WEST  # West
+        elif dx == -6:
+            return Direction.EAST  # East
 
     def is_successor(self, node):
         for succ in self.successors:
