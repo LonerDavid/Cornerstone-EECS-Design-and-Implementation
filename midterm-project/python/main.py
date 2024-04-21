@@ -50,6 +50,23 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
         # TODO: You can write your code to test specific function.
+        M = Maze(filepath=MAZE_FILE)
+        start = int(input("Enter the start : "))
+        end = int(input("Enter the end : "))
+        cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
+        print(cmd)
+        BTInterface.start
+        BTInterface.send_action(cmd)
+        notfinish = True
+        while notfinish:
+            uid = BTInterface.get_UID
+            ScoreboardFake.add_UID(uid)
+            end = BTInterface.bt.serial_read_string
+            if end == "end": #finish
+                BTInterface.end_process
+                final_score = ScoreboardFake.get_current_score
+                print(final_score)
+                notfinish = False
 
     else:
         log.error("Invalid mode")
