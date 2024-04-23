@@ -19,7 +19,7 @@ int AIN1 = 2;
 int AIN2 = 3;
 int BIN1 = 5;
 int BIN2 = 6;
-
+double x = 1.5;
 //下一步的行動
 enum action{
   straight, right, left, uTurn, stop
@@ -30,7 +30,7 @@ double adj_R = 0.5, adj_L = 1;  // 馬達轉速修正係數。MotorWriting(_Tp,_
 
 //利用array儲存action
 int actionNumber = 0;
-int route[6] = {1,3,0,3,2,4};
+int route[5] = {0,1,0,1,4};
 
 //判斷是否偵測到node
 bool NodeDetected = false;
@@ -91,13 +91,13 @@ void Tracking() {
 
 
     double powerCorrection = _Kp * error + _Kd*dError;
-    vR = _Tp - powerCorrection;
-    vL = _Tp + powerCorrection;
+    vR = (_Tp - powerCorrection) * x;
+    vL = (_Tp + powerCorrection) * x;
     lastError = error;
     // end TODO
-    MotorWriting(adj_L * vL, adj_R * vR);
+    MotorWriting(adj_L * vL * x, adj_R * vR * x);
   }
-  else MotorWriting(adj_L * _Tp, adj_R * _Tp);
+  else MotorWriting(adj_L * _Tp * x, adj_R * _Tp * x);
 	
 	//偵測node
   if ((l3 && l2 && m && r2 && r3) == 1){
@@ -107,27 +107,27 @@ void Tracking() {
 
 //functions for actions, needed to be modified.
 void Straight(){
-  MotorWriting(adj_L*_Tp,adj_R*_Tp);
-  delay(1000);
+  MotorWriting(adj_L*_Tp * x,adj_R*_Tp * x);
+  delay(1000/x);
 }
 
 void RightTurn(){
-  MotorWriting(adj_L*_Tp,adj_R*_Tp);
-  delay(700);
-  MotorWriting(adj_L*_Tp,0);
-  delay(1400);
+  MotorWriting(adj_L*_Tp * x,adj_R*_Tp*x);
+  delay(700/x);
+  MotorWriting(adj_L*_Tp*x,0);
+  delay(1400/x);
 }
 
 void LeftTurn(){
-  MotorWriting(adj_L*_Tp,adj_R*_Tp);
-  delay(700);
-  MotorWriting(0,adj_R*_Tp*1.2);
-  delay(1200);
+  MotorWriting(adj_L*_Tp*x,adj_R*_Tp*x);
+  delay(700/x);
+  MotorWriting(0,adj_R*_Tp*1.2*x);
+  delay(1200/x);
 }
 
 void UTurn(){
-  MotorWriting(adj_L*_Tp, -adj_R*_Tp);
-  delay(1800);
+  MotorWriting(adj_L*_Tp*x, -adj_R*_Tp*x);
+  delay(1800/x);
 }
 
 //pin definition
@@ -160,7 +160,7 @@ void loop() {
         halt = true;
         break;   
       default:
-        MotorWriting(adj_L*_Tp,adj_R*_Tp);
+        MotorWriting(adj_L*_Tp*x,adj_R*_Tp*x);
         break;  
       }
     
