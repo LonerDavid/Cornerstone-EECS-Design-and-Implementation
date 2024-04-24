@@ -14,6 +14,8 @@ int extern _Tp;
 // here are something you can try: left_turn, right_turn... etc.
 double turn = 30;
 bool in_node = false;
+double x = 1.5;
+double adj_R = 0.5, adj_L = 1;
 
 void action(int cmd){
     switch (cmd)
@@ -44,53 +46,27 @@ void action(int cmd){
 }
 
 void car_front(){
-    MotorWriting(_Tp,_Tp);
-    delay(2000);
+    MotorWriting(adj_L*_Tp * x,adj_R*_Tp * x);
+    delay(1000/x);
 }
 
 void car_back(){
-    MotorWriting(_Tp,-_Tp);
-    delay(2500);
-    MotorWriting(_Tp, _Tp);
-    delay(800);
-    in_node = car_in_node();
-    while (in_node){
-        MotorWriting(_Tp, -_Tp);
-        delay(10);
-        in_node = car_in_node();
-    }
-    MotorWriting(0, 0);
-    delay(200);
+    MotorWriting(adj_L*_Tp*x, -adj_R*_Tp*x);
+    delay(1800/x);
 }
 
 void car_right(){
-    double vR = _Tp - turn;
-    double vL = _Tp + turn;
-    MotorWriting(vL,vR);
-    delay(800);
-    in_node = car_in_node();
-    while(in_node){
-        MotorWriting(vL,vR);  
-        delay(10);
-        in_node = car_in_node();
-    }
-    MotorWriting(0, 0);
-    delay(200);
+    MotorWriting(adj_L*_Tp * x,adj_R*_Tp*x);
+    delay(700/x);
+    MotorWriting(adj_L*_Tp*x,0);
+    delay(1400/x);
 }
 
 void car_left(){
-    double vR = _Tp + turn;
-    double vL = _Tp - turn;
-    MotorWriting(vL,vR);
-    delay(800);
-    in_node = car_in_node();
-    while(in_node){
-        MotorWriting(vL,vR);  
-        delay(10);
-        in_node = car_in_node();
-    }
-    MotorWriting(0, 0);
-    delay(200);
+    MotorWriting(adj_L*_Tp*x,adj_R*_Tp*x);
+    delay(700/x);
+    MotorWriting(0,adj_R*_Tp*1.2*x);
+    delay(1200/x);
 }
 
 void car_start(){
