@@ -1,10 +1,12 @@
-/*
-Declartion from David, 28/03/2024
-這段code還需要經過調整才能用，
-而且我覺得這種寫法可能會有隱性的嚴重bug，很有可能導致車輛失控，
-在upload前請謹慎檢查。
-*/
 
+#include <MFRC522.h>
+#include <SPI.h>
+#define RST_PIN 9                 // 讀卡機的重置腳位
+#define SS_PIN 53                  // 晶片選擇腳位
+MFRC522 mfrc522(SS_PIN, RST_PIN);  // 建立MFRC522物件
+
+#include "RFID.h"
+#include "bluetooth.h"
 //IR sensor pin setting
 #define L3 40
 #define L2 38
@@ -19,7 +21,7 @@ int AIN1 = 2;
 int AIN2 = 3;
 int BIN1 = 5;
 int BIN2 = 6;
-double x = 1.5;
+double x = 1;
 //下一步的行動
 enum action{
   straight, right, left, uTurn, stop
@@ -30,7 +32,10 @@ double adj_R = 0.5, adj_L = 1;  // 馬達轉速修正係數。MotorWriting(_Tp,_
 
 //利用array儲存action
 int actionNumber = 0;
-int route[5] = {0,1,0,1,4};
+int route[6] = {1,3,0,3,2,4};
+
+byte uid;
+byte idSize = 0;
 
 //判斷是否偵測到node
 bool NodeDetected = false;
@@ -127,7 +132,7 @@ void LeftTurn(){
 
 void UTurn(){
   MotorWriting(adj_L*_Tp*x, -adj_R*_Tp*x);
-  delay(1800/x);
+  delay(1600/x);
 }
 
 //pin definition
@@ -138,9 +143,23 @@ void setup() {
   pinMode(AIN2, OUTPUT);
   pinMode(BIN1, OUTPUT);
   pinMode(BIN2, OUTPUT); 
+
+    // bluetooth initialization
+    Serial1.begin(9600);
+    // Serial window
+    Serial.begin(9600);
+    // RFID initial
+    SPI.begin();
+    mfrc522.PCD_Init();
 }
 
 void loop() {
+  idSize = mfrc522.uid.size; 
+  uid = rfid(idSize);
+  if(uid != NULL){
+    send_byte(uid, idSize);
+  }
+
   if(!halt){
     if(NodeDetected){
     switch(route[actionNumber]){
