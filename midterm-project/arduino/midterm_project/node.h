@@ -12,41 +12,11 @@ int extern _Tp;
 
 // TODO: add some function to control your car when encounter a node
 // here are something you can try: left_turn, right_turn... etc.
-double turn = 30;
-bool in_node = false;
 double x = 1.5;
-double adj_R = 0.5, adj_L = 1;
-
-void action(int cmd){
-    switch (cmd)
-    {
-    case 0:
-        break;
-    case 1:  //Front
-        car_front();
-        break;
-    case 2:  //Back
-        car_back();
-        break;
-    case 3:  //Right
-        car_right();
-        break;
-    case 4:  //Left
-        car_left();
-        break;
-    case 5:  //Start
-        car_start();
-        break;
-    case 6:  //End
-        car_end();
-        break;
-    default:
-        break;
-    }
-}
+double adj_R = 0.48, adj_L = 1;
 
 void car_front(){
-    MotorWriting(adj_L*_Tp * x,adj_R*_Tp * x);
+    MotorWriting(adj_L*_Tp*x, adj_R*_Tp*x);
     delay(1000/x);
 }
 
@@ -63,33 +33,18 @@ void car_right(){
 }
 
 void car_left(){
-    MotorWriting(adj_L*_Tp*x,adj_R*_Tp*x);
+    MotorWriting(adj_L*_Tp*x, adj_R*_Tp*x);
     delay(700/x);
-    MotorWriting(0,adj_R*_Tp*1.2*x);
+    MotorWriting(0, adj_R*_Tp*1.2*x);
     delay(1200/x);
 }
 
 void car_start(){
-    MotorWriting(_Tp,_Tp);
-    delay(1000);
+    MotorWriting(_Tp*x, _Tp*x);
+    delay(1000/x);
 }
 
 void car_end(){
     MotorWriting(0,0);
     delay(1000);
-}
-
-bool car_in_node(){
-    int ll = digitalRead(IRpin_LL);
-    int l = digitalRead(IRpin_L);
-    int m = digitalRead(IRpin_M);
-    int r = digitalRead(IRpin_R);
-    int rr = digitalRead(IRpin_RR);
-
-    if (ll+l+m+r+rr == 5) {
-        return true;
-        }
-    else {
-        return false;
-        }
 }
