@@ -65,6 +65,7 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
     double dError = error - lastError;
     double vR, vL;  // 馬達左右轉速原始值(從PID control 計算出來)。Between -255 to 255.
     double adj_R = 0.46, adj_L = 1;  // 馬達轉速修正係數。MotorWriting(_Tp,_Tp)如果歪掉就要用參數修正。
+    double x = 1.5;
 
     // TODO: complete your P/PID tracking code (Done)
     double powerCorrection = _Kp * error + _Kd*dError;
@@ -72,5 +73,5 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
     vL = _Tp - powerCorrection;
     lastError = error;
     // end TODO
-    MotorWriting(adj_L * vL, adj_R * vR);
+    MotorWriting(adj_L * vL * x, adj_R * vR * x);
 }  // tracking
