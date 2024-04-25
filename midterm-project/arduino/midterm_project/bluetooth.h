@@ -22,19 +22,13 @@ enum BT_CMD {
 
 BT_CMD ask_BT() {
     BT_CMD message;
-    
 // TODO:
 // 1. get cmd from Serial1(bluetooth serial)
 // 2. link bluetooth message to your own command type
-    
     char cmd;
     if (Serial1.available()) {
         cmd=Serial.read();
-        
       //Serial.println(cmd);
-    
-    
-        
         switch(cmd){
             case 'f':
                 message = Front;
@@ -58,9 +52,6 @@ BT_CMD ask_BT() {
                 message = NOTHING;
                 break;
         }
-    
-
-    
 #ifdef DEBUG
         Serial.print("cmd : ");
         Serial.println(cmd);
