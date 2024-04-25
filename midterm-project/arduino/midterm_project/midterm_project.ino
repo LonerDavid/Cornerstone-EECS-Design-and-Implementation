@@ -76,7 +76,7 @@ void setup() {
 
 /*===========================initialize variables===========================*/
 int l2 = 0, l1 = 0, m0 = 0, r1 = 0, r2 = 0;  // 紅外線模組的讀值(0->white,1->black)
-int _Tp = 90;                                // set your own value for motor power
+int _Tp = 100;                                // set your own value for motor power
 bool state = false;     // set state to false to halt the car, set state to true to activate the car
 BT_CMD _cmd = NOTHING;  // enum for bluetooth message, reference in bluetooth.h line 2
 /*===========================initialize variables===========================*/
@@ -99,10 +99,65 @@ void SetState() {
     // TODO:
     // 1. Get command from bluetooth
     // 2. Change state if need
+    _cmd = ask_BT()
+    if (_cmd == End){
+        state = false;
+    }
+    else{
+        state = true;
+    }
 }
 
 void Search() {
     // TODO: let your car search graph(maze) according to bluetooth command from computer(python
     // code)
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+        byte& idSize = mfrc522.uid.size;
+        rfid(idSize);
+        byte* uid = rfid(idSize);
+        send_byte(uid, idSize); // Send the UID over Bluetooth
+    }
+
+    l2 = digitalRead(IRpin_LL);
+    l1 = digitalRead(IRpin_L);
+    m0 = digitalRead(IRpin_M);
+    r1 = digitalRead(IRpin_R);
+    r2 = digitalRead(IRpin_RR);
+
+    if (l2+l1+m0+r1+r2 == 5){
+        switch (_cmd)
+        {
+        case Front:
+            car_front();
+            send_msg('n');
+            break;
+        case Back:
+            car_back();
+            send_msg('n');
+            break;
+        case Right:
+            car_right();
+            send_msg('n');
+            break;
+        case Left:
+            car_left();
+            send_msg('n');
+            break;
+        case Start:
+            car_start();
+            send_msg('n');
+            break;
+        case End: //老實說這一個case永遠不會被呼叫到
+            car_end();
+            send_msg('n')
+            break;
+        default:
+            tracking(l2, l1, m0, r1, r2);
+            break;
+        }
+    }
+    else{
+        tracking(l2, l1, m0, r1, r2);
+    }
 }
 /*===========================define function===========================*/
