@@ -46,7 +46,7 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
     if mode == "0":
         log.info("Mode 0: For treasure-hunting")
         # TODO : for treasure-hunting, which encourages you to hunt as many scores as possible
-
+        
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
         # TODO: You can write your code to test specific function.
@@ -55,7 +55,7 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         end = int(input("Enter the end : "))
         cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
         print(cmd)
-        BTInterface.start
+        BTInterface.start()
         BTInterface.send_action(cmd)
         notfinish = True
         while notfinish:
