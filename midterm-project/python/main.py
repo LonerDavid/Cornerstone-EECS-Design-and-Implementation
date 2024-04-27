@@ -9,7 +9,7 @@ import pandas
 
 from BTinterface import BTInterface
 from maze import Action, Maze
-from score import Scoreboard, ScoreboardFake
+from score import ScoreboardServer, ScoreboardFake
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 # TODO : Fill in the following information (Done)
 TEAM_NAME = "Team 7 Wed-AM"
 SERVER_URL = "http://140.112.175.18:5000/"
-MAZE_FILE = "data/small_maze.csv"
+MAZE_FILE = "data/medium_maze.csv"
 BT_PORT = "COM11"
 
 
@@ -38,15 +38,15 @@ def parse_args():
 
 def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: str):
     maze = Maze(maze_file)
-    point = Scoreboard(team_name, server_url)
-    # point = ScoreboardFake("your team name", "data/fakeUID.csv") # for local testing
+    point = ScoreboardServer(team_name, server_url)
+    #point = ScoreboardFake("your team name", "data/fakeUID.csv") # for local testing
     interface = BTInterface(port=bt_port)
     # TODO : Initialize necessary variables
 
     if mode == "0":
         log.info("Mode 0: For treasure-hunting")
         # TODO : for treasure-hunting, which encourages you to hunt as many scores as possible
-        
+
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
         # TODO: You can write your code to test specific function.
@@ -55,19 +55,58 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         end = int(input("Enter the end : "))
         cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
         print(cmd)
-        BTInterface.start()
-        BTInterface.send_action(cmd)
+        interface.start()
+        interface.send_action(cmd[0])
         notfinish = True
+        i = 0
         while notfinish:
-            uid = BTInterface.get_UID
-            ScoreboardFake.add_UID(uid)
-            end = BTInterface.bt.serial_read_string
-            if end == "end": #finish
-                BTInterface.end_process
-                final_score = ScoreboardFake.get_current_score
+            #if interface.bt.serial_read_string() == 'n':
+               # i = i + 1
+            interface.send_action(cmd[i])
+            uid = interface.get_UID()
+            if isinstance(uid,str):
+                print("Current raw uid: ")
+                print(uid)
+                result = uid.strip()[2:10]
+                point.add_UID(result)
+                print("Current : ")
+                print(point.get_current_score())
+
+
+            if cmd[i-1] == 'e': #finish
+                interface.end_process()
+                final_score = point.get_current_score()
+                print("Final : ")
                 print(final_score)
                 notfinish = False
+                    
+    elif mode == '2':
+        log.info("Mode 2: Mannual Route Input")
+        cmd = 'rbfble'
+        #cmd = 'flfbfrrlrbllflbfe'
+        interface.start()
+        interface.send_action(cmd[0])
+        notfinish = True
+        i = 0
+        while notfinish:
+            if interface.bt.serial_read_string() == 'n':
+                i = i + 1
+                interface.send_action(cmd[i])
+                print(cmd[i])
+            uid = interface.get_UID()
+            print(uid)
+            if(uid != 0):
+                point.add_UID(uid)
+            print("Current : ")
+            print(point.get_current_score())
 
+            if cmd[i-1] == 'e': #finish
+                interface.end_process()
+                final_score = point.get_current_score()
+                print("Final : ")
+                print(final_score)
+                notfinish = False
+                   
     else:
         log.error("Invalid mode")
         sys.exit(1)
