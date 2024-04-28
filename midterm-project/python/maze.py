@@ -65,6 +65,7 @@ class Maze:
 
             if node == node_to:
                 #print(path)
+                #print(len(path)-1)
                 return path  # Return both the path and predecessors
 
             for neighbor in self.node_dict.get(node, []):
@@ -72,6 +73,7 @@ class Maze:
                     predecessor[neighbor] = node  # Update predecessor of neighbor
                     queue.append((neighbor, path + [neighbor]))
         return None
+
 
     def getAction(self, car_dir, node_from: Node, node_to: Node):
         # TODO : get the car action
@@ -104,16 +106,19 @@ class Maze:
         
         return None
 
-    def getActions(self, nodes: List[Node]):
+    def getActions(self, nodes: List[Node],car_dir_init):
         # TODO : given a sequence of nodes, return the corresponding action sequence
         # Tips : iterate through the nodes and use getAction() in each iteration
         action_sequence = []
-        car_dir = int(input("Enter the initial direction(1=North,2=East,3=South,4=West) :"))
+        car_dir = car_dir_init
         for i in range(len(nodes) - 1):  # Iterate through the range of indices of nodes
             action, car_dir = self.getAction(car_dir, nodes[i], nodes[i+1])
             #print(action, car_dir) 
             action_sequence.append(action)
-        return action_sequence
+            if i == len(nodes) - 1 -1:
+                car_dir_current = car_dir
+        
+        return action_sequence,car_dir_current
 
     def actions_to_str(self, actions):
         # cmds should be a string sequence like "fbrl....", use it as the input of BFS checklist #1
@@ -129,12 +134,114 @@ class Maze:
 
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
+    
+    def multiple_node(self,nodes:List[Node]):
+        start = nodes[0]
+        end = nodes[1]
+        car_dir = int(input("Enter the initial direction(1=North,2=East,3=South,4=West) :"))
+        for i in range(amount-1):
+            cmd_total = ""
+            start = nodes[i]
+            end = nodes[i+1]
+            cmd_sequence,car_dir = self.getActions(self.BFS_2(start, end),car_dir)
+            cmd.append(self.actions_to_str(cmd_sequence))
+            #print(cmd[i])
+        cmd_total = ""
+        pathlist = []
+        for i in range(len(cmd)):
+            pathlist.insert(i,cmd[i])
+            cmd_total += cmd[i]
+            
+            if i == len(cmd) - 1:
+                print(cmd[i])
+            else:
+                print(cmd[i], end="") 
+        print(pathlist)
+        return cmd_total
+     
+    def distance(self, node_from: Node, node_to: Node):
+        path = self.BFS_2(node_from,node_to)
+        if path == None:
+            return None
+        else:
+            return len(path)-1
+        
+    def total_point(self, nodes):
+        total = 0
+        for node in nodes:
+            total += 10 * self.distance(node, 6)  # Point of each node is the distance to node 6
+        return total
 
+    def permute(self ,nodes, start, max_distance, current_path=[], current_distance=0):
+        global max_points
+        global max_path
+        
+        if current_distance > max_distance:
+            return
+        
+        if len(current_path) > len(max_path):
+            max_path = current_path[:]
+            max_points = self.total_point(current_path)
+        
+        for i in range(len(nodes)):
+            next_node = nodes[i]
+            next_distance = self.distance(start, next_node)
+            
+            # Add the next node to the current path
+            new_path = current_path + [next_node]
+            
+            # Recursively generate permutations for the rest of the elements
+            self.permute(nodes[:i] + nodes[i+1:], next_node, max_distance, new_path, current_distance + next_distance)
+    
+    
+    
+    
+            
 
 if __name__ == "__main__":
 
-    M = Maze(filepath='/Users/jitingwei/Desktop/maze-5.csv')
-    start = int(input("Enter the start : "))
-    end = int(input("Enter the end : "))
-    print(M.actions_to_str(M.getActions(M.BFS_2(start, end))))
+    M = Maze(filepath='/Users/jitingwei/Desktop/big_maze_112.csv')
     
+    
+    #print(M.distance(start,end))
+    # Driver code
+    specified_nodes = [3, 5, 7, 15, 16, 27, 28, 31, 34, 37, 43, 48]
+    start_node = 6
+    max_distance = 37
+
+    # Remove start_node from specified_nodes if it's present
+    if start_node in specified_nodes:
+        specified_nodes.remove(start_node)
+
+    # Add start_node to the beginning of the specified_nodes list
+    specified_nodes.insert(0, start_node)
+
+    max_points = 0
+    max_path = []
+
+    M.permute(specified_nodes, 6, max_distance)
+    #M.multiple_node(max_path)
+    print("Path with the most points within the max distance:", max_path)
+    print("Total points:", max_points)
+    amount = len(max_path)
+    nodes = []
+    cmd = [] * (amount)
+    
+    for i in range(0, amount):
+        ele = max_path[i]
+        # adding the element
+        nodes.append(ele)
+    M.multiple_node(nodes)
+    '''
+    print(M.distance(6,5))
+    print(M.distance(6,3))
+    print(M.distance(6,27))
+    print(M.distance(6,31))
+    print(M.distance(6,37))
+    print(M.distance(6,43))
+    print(M.distance(6,48))
+    '''
+    
+    
+message.txt
+8 KB
