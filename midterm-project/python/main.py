@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 TEAM_NAME = "Team 7 Wed-AM"
 SERVER_URL = "http://140.112.175.18:5000/"
 MAZE_FILE = "data/medium_maze.csv"
-BT_PORT = "COM11"
+BT_PORT = "COM10"
 
 
 def parse_args():
@@ -53,22 +53,30 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         M = Maze(filepath=MAZE_FILE)
         start = int(input("Enter the start : "))
         end = int(input("Enter the end : "))
-        cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
+        #幫我改這邊 用list把路徑儲存到moves中
+        moves = []
+        moves = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
+        #或是用字串輸出後用append儲存 看你
+        moves = []
+        moves_in_string = maze.strategy(1)
+        for letter in moves_in_string:
+            moves.append(letter)
+        
         print(cmd)
         interface.start()
         interface.send_action(cmd[0])
         notfinish = True
         i = 0
         while notfinish:
-            #if interface.bt.serial_read_string() == 'n':
-               # i = i + 1
-            interface.send_action(cmd[i])
             uid = interface.get_UID()
             if isinstance(uid,str):
+                interface.send_action(moves.pop(0))
+                
                 print("Current raw uid: ")
                 print(uid)
                 result = uid.strip()[2:10]
                 point.add_UID(result)
+                
                 print("Current : ")
                 print(point.get_current_score())
 
@@ -82,30 +90,38 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
                     
     elif mode == '2':
         log.info("Mode 2: Mannual Route Input")
+        # TODO: You can write your code to test specific function.
+        M = Maze(filepath=MAZE_FILE)
+        #start = int(input("Enter the start : "))
+        #end = int(input("Enter the end : "))
+        #cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
         cmd = 'rbfble'
-        #cmd = 'flfbfrrlrbllflbfe'
+        print(cmd)
         interface.start()
-        interface.send_action(cmd[0])
         notfinish = True
         i = 0
         while notfinish:
-            if interface.bt.serial_read_string() == 'n':
-                i = i + 1
-                interface.send_action(cmd[i])
-                print(cmd[i])
             uid = interface.get_UID()
-            print(uid)
-            if(uid != 0):
-                point.add_UID(uid)
-            print("Current : ")
-            print(point.get_current_score())
+            if isinstance(uid,str):
+                print("Current raw uid: ")
+                print(uid)
+                if uid=='0x6e0a':
+                    if cmd == '': #finish
+                        interface.end_process()
+                        final_score = point.get_current_score()
+                        print("Final : ")
+                        print(final_score)
+                        notfinish = False
+                    else:
+                        interface.send_action(cmd[i])
+                        print("action sent: " + cmd[i])
+                        i = i + 1
 
-            if cmd[i-1] == 'e': #finish
-                interface.end_process()
-                final_score = point.get_current_score()
-                print("Final : ")
-                print(final_score)
-                notfinish = False
+                else:
+                    result = uid.strip()[2:10]
+                    point.add_UID(result)
+                    print("Current : ")
+                    print(point.get_current_score())
                    
     else:
         log.error("Invalid mode")
