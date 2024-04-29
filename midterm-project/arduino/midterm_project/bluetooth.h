@@ -16,8 +16,8 @@ enum BT_CMD {
     Back,
     Right,
     Left,
-    Start,
-    End
+    GoGo,
+    StopAction
 };
 
 BT_CMD ask_BT() {
@@ -27,7 +27,7 @@ BT_CMD ask_BT() {
 // 2. link bluetooth message to your own command type
     char cmd;
     if (Serial1.available()) {
-        cmd=Serial.read();
+        cmd=Serial1.read();
       //Serial.println(cmd);
         switch(cmd){
             case 'f':
@@ -43,10 +43,10 @@ BT_CMD ask_BT() {
                 message = Left;
                 break;
             case 's':
-                message = Start;
+                message = GoGo;
                 break;
             case 'e':
-                message = End;
+                message = StopAction;
                 break;
             default:
                 message = NOTHING;

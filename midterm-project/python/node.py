@@ -36,13 +36,13 @@ class Node:
         # However, if node is not adjacent to the present node, print error message and return 0
         prev = self.get_successors(node)
         dx = node - prev
-        if dx == -1:
+        if dx == 1:
             return Direction.NORTH  # North
-        elif dx == 1:
+        elif dx == -1:
             return Direction.SOUTH  # South
-        elif dx == 6:
+        elif dx == 3:
             return Direction.WEST  # West
-        elif dx == -6:
+        elif dx == -3:
             return Direction.EAST  # East
 
     def is_successor(self, node):

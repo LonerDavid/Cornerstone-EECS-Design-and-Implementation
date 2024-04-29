@@ -243,5 +243,3 @@ if __name__ == "__main__":
     '''
     
     
-message.txt
-8 KB

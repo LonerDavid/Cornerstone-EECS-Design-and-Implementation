@@ -9,11 +9,11 @@
 /*===========================import variable===========================*/
 int extern _Tp;
 /*===========================import variable===========================*/
-
+#include "track.h"
 // TODO: add some function to control your car when encounter a node
 // here are something you can try: left_turn, right_turn... etc.
 double x = 1.5;
-double adj_R = 0.48, adj_L = 1;
+double adj_R = 0.49, adj_L = 1;
 
 void car_front(){
     MotorWriting(adj_L*_Tp*x, adj_R*_Tp*x);
@@ -40,8 +40,8 @@ void car_left(){
 }
 
 void car_start(){
-    MotorWriting(_Tp*x, _Tp*x);
-    delay(500);
+    MotorWriting(adj_L*_Tp*x, adj_R*_Tp*x);
+    delay(800);
 }
 
 void car_end(){

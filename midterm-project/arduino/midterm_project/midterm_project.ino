@@ -21,12 +21,12 @@
 // 19    RX       <-  TX
 // TB6612, 請按照自己車上的接線寫入腳位(左右不一定要跟註解寫的一樣)
 // TODO: 請將腳位寫入下方(Done)
-#define MotorR_I1 2     // 定義 A1 接腳（右）
-#define MotorR_I2 3     // 定義 A2 接腳（右）
-#define MotorR_PWMR 11  // 定義 ENA (PWM調速) 接腳
-#define MotorL_I3 5     // 定義 B1 接腳（左）
-#define MotorL_I4 6     // 定義 B2 接腳（左）
-#define MotorL_PWML 12  // 定義 ENB (PWM調速) 接腳
+#define MotorL_I1 2     // 定義 A1 接腳（左）
+#define MotorL_I2 3     // 定義 A2 接腳（左）
+#define MotorL_PWML 11  // 定義 ENA (PWM調速) 接腳
+#define MotorR_I3 5     // 定義 B1 接腳（右）
+#define MotorR_I4 6     // 定義 B2 接腳（右）
+#define MotorR_PWMR 12  // 定義 ENB (PWM調速) 接腳
 // 循線模組, 請按照自己車上的接線寫入腳位
 #define IRpin_LL 40
 #define IRpin_L 38
@@ -49,12 +49,12 @@ void setup() {
     SPI.begin();
     mfrc522.PCD_Init();
     // TB6612 pin
-    pinMode(MotorR_I1, OUTPUT);
-    pinMode(MotorR_I2, OUTPUT);
-    pinMode(MotorL_I3, OUTPUT);
-    pinMode(MotorL_I4, OUTPUT);
-    pinMode(MotorL_PWML, OUTPUT);
+    pinMode(MotorL_I1, OUTPUT);
+    pinMode(MotorL_I2, OUTPUT);
+    pinMode(MotorR_I3, OUTPUT);
+    pinMode(MotorR_I4, OUTPUT);
     pinMode(MotorR_PWMR, OUTPUT);
+    pinMode(MotorL_PWML, OUTPUT);
     // tracking pin
     pinMode(IRpin_LL, INPUT);
     pinMode(IRpin_L, INPUT);
@@ -99,11 +99,11 @@ void SetState() {
     // TODO:
     // 1. Get command from bluetooth
     // 2. Change state if need
-    _cmd = ask_BT()
-    if (_cmd == End){
+    _cmd = ask_BT();
+    if (_cmd == StopAction){
         state = false;
     }
-    else{
+    else if (_cmd == GoGo){
         state = true;
     }
 }
@@ -130,26 +130,32 @@ void Search() {
         case Front:
             car_front();
             send_msg('n');
+            Serial.println("Front!");
             break;
         case Back:
             car_back();
             send_msg('n');
+            Serial.println("Back!");
             break;
         case Right:
             car_right();
             send_msg('n');
+            Serial.println("Right!");
             break;
         case Left:
             car_left();
             send_msg('n');
+            Serial.println("Left!");
             break;
-        case Start:
-            car_start();
+        case GoGo:
+            car_start();  
             send_msg('n');
+            Serial.println("GoGO!");
             break;
-        case End: //老實說這一個case永遠不會被呼叫到
+        case StopAction: //老實說這一個case永遠不會被呼叫到
             car_end();
-            send_msg('n')
+            send_msg('n');
+            Serial.println("Stop!");
             break;
         default:
             tracking(l2, l1, m0, r1, r2);
