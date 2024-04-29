@@ -46,6 +46,57 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
     if mode == "0":
         log.info("Mode 0: For treasure-hunting")
         # TODO : for treasure-hunting, which encourages you to hunt as many scores as possible
+        M = Maze(filepath=MAZE_FILE) 
+        specified_nodes = [3, 5, 7, 15, 16, 27, 28, 31, 34, 37, 43, 48]
+        start_node = 6
+        max_distance = 37
+
+        # Remove start_node from specified_nodes if it's present
+        if start_node in specified_nodes:
+            specified_nodes.remove(start_node)
+
+        # Add start_node to the beginning of the specified_nodes list
+        specified_nodes.insert(0, start_node)
+
+        max_points = 0
+        max_path = []
+
+        M.permute(specified_nodes, 6, max_distance)
+        #M.multiple_node(max_path)
+        print("Path with the most points within the max distance:", max_path)
+        print("Total points:", max_points)
+        amount = len(max_path)
+        nodes = []
+        cmd = [] * (amount)
+        
+        for i in range(0, amount):
+            ele = max_path[i]
+            # adding the element
+            nodes.append(ele)
+        cmd = M.multiple_node(nodes)
+        print("Command: " + cmd)
+        interface.start()
+        notfinish = True
+        i = 0
+        while notfinish:
+            uid = interface.get_UID()
+            if isinstance(uid,str):
+                print("Current raw uid: ")
+                print(uid)
+                if uid=='0x6e0a':
+                    interface.send_action(cmd[i])
+                    i = i + 1
+                    if cmd == '': #finish
+                        interface.end_process()
+                        final_score = point.get_current_score()
+                        print("Final : ")
+                        print(final_score)
+                        notfinish = False
+                else:
+                    result = uid.strip()[2:10]
+                    point.add_UID(result)
+                    print("Current : ")
+                    print(point.get_current_score())
 
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
@@ -53,50 +104,8 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         M = Maze(filepath=MAZE_FILE)
         start = int(input("Enter the start : "))
         end = int(input("Enter the end : "))
-        #幫我改這邊 用list把路徑儲存到moves中
-        moves = []
-        moves = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
-        #或是用字串輸出後用append儲存 看你
-        moves = []
-        moves_in_string = maze.strategy(1)
-        for letter in moves_in_string:
-            moves.append(letter)
-        
-        print(cmd)
-        interface.start()
-        interface.send_action(cmd[0])
-        notfinish = True
-        i = 0
-        while notfinish:
-            uid = interface.get_UID()
-            if isinstance(uid,str):
-                interface.send_action(moves.pop(0))
-                
-                print("Current raw uid: ")
-                print(uid)
-                result = uid.strip()[2:10]
-                point.add_UID(result)
-                
-                print("Current : ")
-                print(point.get_current_score())
-
-
-            if cmd[i-1] == 'e': #finish
-                interface.end_process()
-                final_score = point.get_current_score()
-                print("Final : ")
-                print(final_score)
-                notfinish = False
-                    
-    elif mode == '2':
-        log.info("Mode 2: Mannual Route Input")
-        # TODO: You can write your code to test specific function.
-        M = Maze(filepath=MAZE_FILE)
-        #start = int(input("Enter the start : "))
-        #end = int(input("Enter the end : "))
-        #cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
-        cmd = 'rbfble'
-        print(cmd)
+        cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
+        print("Command: " + cmd)
         interface.start()
         notfinish = True
         i = 0
@@ -107,6 +116,41 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
                 print(uid)
                 if uid=='0x6e0a':
                     if cmd == '': #finish
+                        interface.end_process()
+                        final_score = point.get_current_score()
+                        print("Final : ")
+                        print(final_score)
+                        notfinish = False
+                    else:
+                        interface.send_action(cmd[i])
+                        print("action sent: " + cmd[i])
+                        i = i + 1
+
+                else:
+                    result = uid.strip()[2:10]
+                    point.add_UID(result)
+                    print("Current : ")
+                    print(point.get_current_score())
+                    
+    elif mode == '2':
+        log.info("Mode 2: Mannual Route Input")
+        # TODO: You can write your code to test specific function.
+        M = Maze(filepath=MAZE_FILE)
+        #start = int(input("Enter the start : "))
+        #end = int(input("Enter the end : "))
+        #cmd = M.actions_to_str(M.getActions(M.BFS_2(start, end)))
+        cmd = 'rbfble'
+        print("Command: " + cmd)
+        interface.start()
+        notfinish = True
+        i = 0
+        while notfinish:
+            uid = interface.get_UID()
+            if isinstance(uid,str):
+                print("Current raw uid: ")
+                print(uid)
+                if uid=='0x6e0a':
+                    if cmd[i-1] == 'e': #finish
                         interface.end_process()
                         final_score = point.get_current_score()
                         print("Final : ")
