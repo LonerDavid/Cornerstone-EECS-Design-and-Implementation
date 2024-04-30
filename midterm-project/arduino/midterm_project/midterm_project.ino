@@ -100,11 +100,11 @@ void SetState() {
     // 1. Get command from bluetooth
     // 2. Change state if need
     _cmd = ask_BT();
-    if (_cmd == StopAction){
-        state = false;
-    }
-    else if (_cmd == GoGo){
+    if (_cmd == GoGo){
         state = true;
+    }
+    else if (_cmd == StopAction){
+        state = state;
     }
 }
 
@@ -156,6 +156,7 @@ void Search() {
             car_end();
             send_msg('n');
             Serial.println("Stop!");
+            state = false;
             break;
         default:
             tracking(l2, l1, m0, r1, r2);

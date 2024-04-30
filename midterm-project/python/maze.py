@@ -30,6 +30,11 @@ class Maze:
         self.raw_data = pandas.read_csv(filepath).values
         self.nodes = []
         self.node_dict = dict() # key: index, value: the correspond node
+        self.max_points = 0
+        self.max_path = []
+        self.amount = len(self.max_path)
+        self.nodes = []
+        self.cmd = [] * (self.amount)
 
         for row in self.raw_data:
             node = int(row[0])
@@ -139,23 +144,23 @@ class Maze:
         start = nodes[0]
         end = nodes[1]
         car_dir = int(input("Enter the initial direction(1=North,2=East,3=South,4=West) :"))
-        for i in range(amount-1):
+        for i in range(self.amount-1):
             cmd_total = ""
             start = nodes[i]
             end = nodes[i+1]
             cmd_sequence,car_dir = self.getActions(self.BFS_2(start, end),car_dir)
-            cmd.append(self.actions_to_str(cmd_sequence))
+            self.cmd.append(self.actions_to_str(cmd_sequence))
             #print(cmd[i])
         cmd_total = ""
         pathlist = []
-        for i in range(len(cmd)):
-            pathlist.insert(i,cmd[i])
-            cmd_total += cmd[i]
+        for i in range(len(self.cmd)):
+            pathlist.insert(i,self.cmd[i])
+            cmd_total += self.cmd[i]
             
-            if i == len(cmd) - 1:
-                print(cmd[i])
+            if i == len(self.cmd) - 1:
+                print(self.cmd[i])
             else:
-                print(cmd[i], end="") 
+                print(self.cmd[i], end="") 
         print(pathlist)
         return cmd_total
      
@@ -173,15 +178,14 @@ class Maze:
         return total
 
     def permute(self ,nodes, start, max_distance, current_path=[], current_distance=0):
-        global max_points
-        global max_path
+        
         
         if current_distance > max_distance:
             return
         
-        if len(current_path) > len(max_path):
-            max_path = current_path[:]
-            max_points = self.total_point(current_path)
+        if len(current_path) > len(self.max_path):
+            self.max_path = current_path[:]
+            self.max_points = self.total_point(current_path)
         
         for i in range(len(nodes)):
             next_node = nodes[i]
@@ -200,14 +204,14 @@ class Maze:
 
 if __name__ == "__main__":
 
-    M = Maze(filepath='/Users/jitingwei/Desktop/big_maze_112.csv')
+    M = Maze(filepath='data/big_maze_112.csv')
     
     
     #print(M.distance(start,end))
     # Driver code
     specified_nodes = [3, 5, 7, 15, 16, 27, 28, 31, 34, 37, 43, 48]
     start_node = 6
-    max_distance = 37
+    max_distance = 25
 
     # Remove start_node from specified_nodes if it's present
     if start_node in specified_nodes:
@@ -216,22 +220,22 @@ if __name__ == "__main__":
     # Add start_node to the beginning of the specified_nodes list
     specified_nodes.insert(0, start_node)
 
-    max_points = 0
-    max_path = []
+    
 
     M.permute(specified_nodes, 6, max_distance)
     #M.multiple_node(max_path)
-    print("Path with the most points within the max distance:", max_path)
-    print("Total points:", max_points)
-    amount = len(max_path)
-    nodes = []
-    cmd = [] * (amount)
+    print("Path with the most points within the max distance:", M.max_path)
+    print("Total points:", M.max_points)
     
-    for i in range(0, amount):
-        ele = max_path[i]
+    M.amount = len(M.max_path)
+    M.nodes = []
+    M.cmd = [] * (M.amount)
+    
+    for i in range(0, M.amount):
+        ele = M.max_path[i]
         # adding the element
-        nodes.append(ele)
-    M.multiple_node(nodes)
+        M.nodes.append(ele)
+    M.multiple_node(M.nodes)
     '''
     print(M.distance(6,5))
     print(M.distance(6,3))
